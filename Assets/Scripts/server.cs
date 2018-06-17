@@ -21,5 +21,11 @@ public class server : MonoBehaviour
     {
         if (clients == null)
             clients = new List<client>();
+        //DisplayAllClients();
+    }
+
+    public void DisplayAllClients(bool display=true)
+    {
+        clients.ForEach(c => { c.DisplayClient(display);});
     }
 }
