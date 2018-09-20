@@ -1,25 +1,34 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class DisplayClients : MonoBehaviour {
+[System.Serializable]
+public class ClientToDiplay {
 
-    public clientToDisplay[] clientsToDisplay;
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-    public void DisplayClient(client givenClient)
+    public GameObject client;
+
+    private Text id;
+    private Text bet;
+
+    public void Display(bool active = true)
     {
-
+        client.SetActive(active);
     }
 
-    [System.Serializable]
-    public class clientToDisplay
+    public void UpdateClient(int id, int bet)
     {
-        client _client;
-        GameObject display;
+        if (this.id == null || this.bet == null)
+        {
+            init();
+        }
+        this.id.text = id.ToString();
+        this.bet.text = bet.ToString();
     }
 
+    private void init()
+    {
+        this.id = client.transform.Find("id").GetComponent<Text>();
+        this.bet = client.transform.Find("Nu").GetComponent<Text>();
+    }
 }

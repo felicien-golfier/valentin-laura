@@ -4,20 +4,26 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [System.Serializable]
-public class client
+public class Client
 {
     public int nfc_id = 0;
     public int nbRemainingBet = 0;
-    public GameObject go;
+    public ClientToDiplay go;
+
+    public Client(int nfc_id, int nbRemainingBet, ClientToDiplay go)
+    {
+        this.nfc_id = nfc_id;
+        this.nbRemainingBet = nbRemainingBet;
+        this.go = go;
+    }
 
     public void DisplayClient(bool display)
     {
-        go.SetActive(display);
-        if (display)
+        if (!go.client)
         {
-            go.transform.GetChild(0).GetComponent<Text>().text = nfc_id.ToString();
-            go.transform.GetChild(1).GetComponent<Text>().text = nbRemainingBet.ToString();
+            tools.instance.DisplayPopup(true, "This client has no interface.");
         }
+        go.UpdateClient(nfc_id, nbRemainingBet);
+        go.Display(display);
     }
-
 }
