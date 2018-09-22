@@ -6,13 +6,17 @@ using UnityEngine;
 public class server : MonoBehaviour
 {
 
-    public List<store> stores;
-    public List<Client> clients;
+    private List<store> stores;
+    private List<Client> clients;
+
     public List<ClientToDiplay> clientsInterface;
+
+    public int lower = -99;
+    public int greater = 13;
 
     private void Update()
     {
-        
+        DisplayAllClients();
     }
 
     private void Start()
@@ -22,7 +26,7 @@ public class server : MonoBehaviour
         //DisplayAllClients();
     }
 
-    private Client FindClient(List<Client> clients, int nfc_id)
+    private Client FindClient(string nfc_id)
     {
         foreach (Client c in clients)
         {
@@ -35,9 +39,9 @@ public class server : MonoBehaviour
         clients.ForEach(c => { c.DisplayClient(display);});
     }
 
-    public bool UpdateClient(int nfc_id, int addBetNumber)
+    public bool UpdateClient(string nfc_id, int addBetNumber)
     {
-        Client _client = FindClient(clients, nfc_id);
+        Client _client = FindClient(nfc_id);
         if (_client != null)
         {
             _client.nbRemainingBet += addBetNumber;
@@ -48,12 +52,17 @@ public class server : MonoBehaviour
         return false;
     }
 
-    public Client NewClient(int nfc_id, int addBetNumber = 0)
+    public Client NewClient(string nfc_id)
     {
-        Client _client = new Client(nfc_id, addBetNumber, GetNextEmptyClientGo());
-        clients.Add(_client);
-        _client.DisplayClient(true);
-        return clients[clients.Count - 1];
+        Client _client = GetClient(nfc_id);
+        if (_client == null)
+        {
+            _client = new Client(nfc_id, 0, GetNextEmptyClientGo());
+            clients.Add(_client);
+            _client.DisplayClient(true);
+        }
+
+        return _client;
     }
 
     private ClientToDiplay GetNextEmptyClientGo()
@@ -61,15 +70,44 @@ public class server : MonoBehaviour
         try
         {
             return clientsInterface[clients.Count];
-        }catch(Exception e)
+        }catch
         {
-            tools.instance.DisplayPopup(true, "It's a test version Only " +clientsInterface.Count +" clients possible.");
+            tools.DisplayPopup(true, "It's a test version Only " +clientsInterface.Count +" clients possible.");
         }
         return null;
     }
 
-    public Client GetClient(int id)
+    public Client GetClient(string id)
     {
         return clients.Find(x => x.nfc_id == id);
+    }
+
+    public float Tir(string id)
+    {
+        Client _client = FindClient(id);
+        if (_client == null)
+        {
+            Debug.Log("Client Not registered !!");
+            return -1;
+        }else if (_client.nbRemainingBet <= 0)
+        {
+            Debug.Log("Client Has No remaining Bet !!");
+            return -1;
+        }
+        else
+        {
+            float gain = GetGain();
+            if (gain <= 0)
+                return 0;
+            _client.Won(gain);
+            tools.DisplayPopupFromThread("You Won " + gain + "!!");
+            return gain;
+        }
+    }
+
+    public float GetGain()
+    {
+        System.Random rnd = new System.Random();
+        return (float) Math.Floor( Math.Exp(rnd.Next(lower,greater)));
     }
 }

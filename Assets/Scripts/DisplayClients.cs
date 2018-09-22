@@ -10,19 +10,21 @@ public class ClientToDiplay {
 
     private Text id;
     private Text bet;
+    private Text gains;
 
     public void Display(bool active = true)
     {
         client.SetActive(active);
     }
 
-    public void UpdateClient(int id, int bet)
+    public void UpdateClient(string id, int bet, float gains)
     {
         if (this.id == null || this.bet == null)
         {
             init();
         }
         this.id.text = id.ToString();
+        this.gains.text = gains.ToString();
         this.bet.text = bet.ToString();
     }
 
@@ -30,5 +32,6 @@ public class ClientToDiplay {
     {
         this.id = client.transform.Find("id").GetComponent<Text>();
         this.bet = client.transform.Find("Nu").GetComponent<Text>();
+        this.gains = client.transform.Find("gains").GetComponent<Text>();
     }
 }

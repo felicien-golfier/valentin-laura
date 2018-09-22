@@ -10,24 +10,39 @@ public class store : MonoBehaviour {
 
     private int laura_id;
     private Client _client;
+    private char separator = ':';
+    private string lastUdpPacket;
 
-
-    //Read NFC ID of a Client and store it. 
-    public void ReadNFCID()
+    private void Update()
     {
-        _client = _server.NewClient(Random.Range(100000000, 999999999), 0);
+        if (_client != null)
+            UpdateMyClient();
+        string  udp = tools.instance.udp.getLatestUDPPacket();
+        if (udp != "" && udp != lastUdpPacket)
+        {
+            lastUdpPacket = udp;
+            ReadNFCID(lastUdpPacket);
+        }
+    }
+    //Read NFC ID of a Client and store it. 
+    public void FakeReadNFCID()
+    {
+        _client = _server.NewClient(Random.Range(100000000, 999999999).ToString());
         UpdateMyClient();
     }
-
-    private void Activate()
+    public void ReadNFCID(string recieved_Client)
     {
+        string clientID = recieved_Client.Split(separator)[1].Remove(0, 1).Replace("\r","");
 
+        Debug.Log(clientID);
+        _client = _server.NewClient(clientID);
+        UpdateMyClient();
     }
 
     public void UpdateMyClient()
     {
         _client = _server.GetClient(_client.nfc_id);
-        myClient.UpdateClient(_client.nfc_id, _client.nbRemainingBet);
+        myClient.UpdateClient(_client.nfc_id, _client.nbRemainingBet, _client.gains);
         myClient.Display();
     }
 
@@ -35,11 +50,11 @@ public class store : MonoBehaviour {
     {
         if (_client == null)
         {
-            tools.instance.DisplayPopup(true, "Please select a client");
+            tools.DisplayPopup(true, "Please select a client");
         }else
         {
             if (_server.UpdateClient(_client.nfc_id, number))
-                tools.instance.DisplayPopup(true, "RequestSent");        
+                tools.DisplayPopup(true, "RequestSent");        
         }
     }
 }
