@@ -49,7 +49,8 @@ public class UDPReceive : MonoBehaviour
     {
         Debug.Log("Application ending after " + Time.time + " seconds");
         stopThread = true;
-        client.Close();
+        if (client != null)
+            client.Close();
         receiveThread.Abort();
     }
 

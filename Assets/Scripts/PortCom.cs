@@ -22,10 +22,13 @@ public class PortCom : MonoBehaviour {
 
     void Start()
     {
-        comPort = FindMyPortAndConnect();
-        portComThread = new Thread(new ThreadStart(mainThread));
-        portComThread.IsBackground = true;
-        portComThread.Start();
+        if (tools.instance.ImServer)
+        {
+            comPort = FindMyPortAndConnect();
+            portComThread = new Thread(new ThreadStart(mainThread));
+            portComThread.IsBackground = true;
+            portComThread.Start();
+        }
     }
 
     private string FindMyPortAndConnect()

@@ -1,17 +1,35 @@
-﻿using System.Collections;
+﻿#define SERVER
+//#define CLIENT
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class MyNet : NetworkBehaviour {
+public class MyNet : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-    public override void OnStartServer()
+    public bool ImServer;
+    NetworkManager manager;
+
+    private void Awake()
     {
-            tools.instance.ImServer = true;
+        this.manager = this.GetComponent<NetworkManager>();
     }
+
+    void Start () {
+        if (ImServer)
+            manager.StartServer();
+        else
+            StartClient();
+    }
+
+    public void StartClient()
+    {
+        manager.StartClient();
+    }
+
+    public void SetupServer()
+    {
+        NetworkServer.Listen(4444);
+    }
+
 }

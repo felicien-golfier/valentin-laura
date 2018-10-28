@@ -16,6 +16,16 @@ public class tools : MonoBehaviour {
         }
         get { return m_ImServer; }
     }
+    private bool m_ImConnected;
+    public bool ImConnected
+    {
+        set
+        {
+            m_ImConnected = value;
+            ClientConnected(value);
+        }
+        get { return m_ImConnected; }
+    }
     public GameObject popup;
     public Text popupText;
     public GameObject server;
@@ -23,9 +33,6 @@ public class tools : MonoBehaviour {
     public UDPReceive udp;
     public MyNet myNet;
     private string PopupToDisplay = "";
-
-    public NetworkManager networkManager;
-    NetworkIdentity networkIdentity;
 
     private static tools _instance;
     public static tools instance
@@ -39,8 +46,7 @@ public class tools : MonoBehaviour {
     private void Awake()
     {
         _instance = this;
-        ChangeServerClient(ImServer);
-        
+        ImServer = myNet.ImServer;
     }
 
     private void Update()
@@ -80,14 +86,18 @@ public class tools : MonoBehaviour {
     {
         if (ServerToClient == false || (ServerToClient == null && server.activeSelf))
         {
-            server.SetActive(false);
-            store.SetActive(true);
-        }
-        else if(ServerToClient == true || (ServerToClient == null && !server.activeSelf))
-        {
             server.SetActive(true);
             store.SetActive(false);
         }
+        else if(ServerToClient == true || (ServerToClient == null && !server.activeSelf))
+        {
+            server.SetActive(false);
+            store.SetActive(true);
+        }
+    }
+    private void ClientConnected(bool connexion)
+    {
+
     }
 
 }
