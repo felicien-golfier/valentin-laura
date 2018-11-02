@@ -9,7 +9,7 @@ public class MyNet : MonoBehaviour {
 
     public bool ImServer;
     NetworkManager manager;
-
+ 
     private void Awake()
     {
         this.manager = this.GetComponent<NetworkManager>();
@@ -17,19 +17,10 @@ public class MyNet : MonoBehaviour {
 
     void Start () {
         if (ImServer)
-            manager.StartServer();
+            manager.StartHost();
         else
-            StartClient();
+        {   
+            manager.StartClient();
+        }
     }
-
-    public void StartClient()
-    {
-        manager.StartClient();
-    }
-
-    public void SetupServer()
-    {
-        NetworkServer.Listen(4444);
-    }
-
 }

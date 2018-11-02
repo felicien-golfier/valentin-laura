@@ -19,7 +19,7 @@ public class ClientToDiplay {
 
     public void UpdateClient(string id, int bet, float gains)
     {
-        if (this.id == null || this.bet == null)
+        if (this.id == null || this.bet == null || this.gains == null)
         {
             init();
         }

@@ -5,16 +5,66 @@ using UnityEngine.Networking;
 
 public class NetworkBehaviourManager : NetworkBehaviour
 {
+    private NetworkIdentity nid;
+    private void Awake()
+    {
+        nid = GetComponent<NetworkIdentity>();
+    }
+
+
+    [Command]
+    public void CmdNewClient(string nfc_id)
+    {
+        Tools.instance.serverLaura.NewClient(nfc_id);
+    }
+
+    [Command]
+    public void CmdAddBet(string nfc_id, int number)
+    {
+        Tools.instance.serverLaura.AddBet(nfc_id, number);
+    }
+
+    [Command]
+    public void CmdGetClientToStore(string id)
+    {
+        Tools.instance.serverLaura.GetClientToStore(id);
+    }
+
+    [ClientRpc]
+    public void RpcSendClient(string nfc_id, int nbRemainingBet, float gains)
+    {
+        if (!isServer)
+        {
+            Tools.DisplayPopup(true, "Got Client !!");
+            Tools.instance.store.UpdateMyClient(nfc_id, nbRemainingBet, gains);
+        }
+    }
+
+    public void ConnectedToServer(bool connexion)
+    {
+        nid.localPlayerAuthority = connexion;
+    }
 
     public override void OnStartServer()
     {
-        tools.instance.ImServer = true;
+        Tools.instance.ImServer = true;
+        ConnectedToServer(false);
         Debug.Log("I'm server !");
     }
     public override void OnStartClient()
     {
-        tools.instance.ImServer = false;
-        tools.instance.ImConnected = true;
-        Debug.Log("I'm Client CONNECTED !");
+        if (!isServer)
+        {
+            Tools.instance.ImServer = false;
+            Tools.instance.ImConnected = true;
+            ConnectedToServer(true);
+            Debug.Log("I'm Client CONNECTED !");
+        }
+    }
+
+    public override void OnStartLocalPlayer()
+    {
+        Tools.instance.netManager = this;
+        Debug.Log("OnStartLocalPlayer!");
     }
 }

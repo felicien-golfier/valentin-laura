@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if !UNITY_ANDROID
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO.Ports;
@@ -11,7 +12,7 @@ public class PortCom : MonoBehaviour {
     public int bauds = 9600;
     private SerialPort sp;
     private string comPort;
-    public server _server;
+    public ServerLaura _server;
 
     private string tirRestants = "TIRS_RESTANTS";
     private string answerRestants = "RESTANTS";
@@ -22,7 +23,7 @@ public class PortCom : MonoBehaviour {
 
     void Start()
     {
-        if (tools.instance.ImServer)
+        if (Tools.instance.ImServer)
         {
             comPort = FindMyPortAndConnect();
             portComThread = new Thread(new ThreadStart(mainThread));
@@ -79,7 +80,9 @@ public class PortCom : MonoBehaviour {
 
     private void OnApplicationQuit()
     {
-        sp.Close();
+        if (sp != null)
+            sp.Close();
+        if (portComThread != null)
         portComThread.Abort();
     }
 
@@ -91,7 +94,7 @@ public class PortCom : MonoBehaviour {
         {
             try
             {
-                if (sp.IsOpen)
+                if (sp != null && sp.IsOpen)
                 {
                     string tempS = sp.ReadLine();
                     Debug.Log("SerialData : " + tempS);
@@ -101,7 +104,7 @@ public class PortCom : MonoBehaviour {
                     if (splitTempS[1] == tirRestants)
                     {
                         
-                        Client client = _server.GetClient(splitTempS[0]);
+                        ClientLaura client = _server.GetClientByID(splitTempS[0]);
                         if (client != null)
                         {
                             string answer = splitTempS[0] + answerRestants + client.nbRemainingBet;
@@ -134,3 +137,4 @@ public class PortCom : MonoBehaviour {
 
 
 }
+#endif

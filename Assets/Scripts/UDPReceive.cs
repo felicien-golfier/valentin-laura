@@ -27,8 +27,10 @@ public class UDPReceive : MonoBehaviour
 
 
     // start from shell
+    // USEFULL ? 
     private static void Main()
     {
+        Debug.Log("Is that usefull ?");
         UDPReceive receiveObj = new UDPReceive();
         receiveObj.init();
 
@@ -42,7 +44,10 @@ public class UDPReceive : MonoBehaviour
     // start from unity3d
     public void Start()
     {
-        init();
+        if (!Tools.instance.ImServer)
+        {
+            init();
+        }
     }
 
     void OnApplicationQuit()
@@ -51,6 +56,7 @@ public class UDPReceive : MonoBehaviour
         stopThread = true;
         if (client != null)
             client.Close();
+        if (receiveThread != null)
         receiveThread.Abort();
     }
 
@@ -58,7 +64,7 @@ public class UDPReceive : MonoBehaviour
     private void init()
     {
         // Endpunkt definieren, von dem die Nachrichten gesendet werden.
-        Debug.Log("UDPSend.init()");
+        Debug.Log("UDPReceive.init");
 
         // define port
         if (port<=0)

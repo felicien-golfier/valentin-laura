@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 
-public class tools : MonoBehaviour {
+public class Tools : MonoBehaviour {
 
     private bool m_ImServer;
     public bool ImServer
@@ -26,16 +26,19 @@ public class tools : MonoBehaviour {
         }
         get { return m_ImConnected; }
     }
+    
     public GameObject popup;
     public Text popupText;
     public GameObject server;
-    public GameObject store;
+    public ServerLaura serverLaura;
+    public Store store;
+    public NetworkBehaviourManager netManager;
     public UDPReceive udp;
     public MyNet myNet;
     private string PopupToDisplay = "";
 
-    private static tools _instance;
-    public static tools instance
+    private static Tools _instance;
+    public static Tools instance
     {
         get
         {
@@ -47,15 +50,6 @@ public class tools : MonoBehaviour {
     {
         _instance = this;
         ImServer = myNet.ImServer;
-    }
-
-    private void Update()
-    {
-        if (PopupToDisplay != "")
-        {
-            DisplayPopup(true, PopupToDisplay);
-            PopupToDisplay = "";
-        }        
     }
 
     public static void DisplayPopup(bool display, string txt = "")
@@ -84,20 +78,19 @@ public class tools : MonoBehaviour {
     }
     private void ChangeServerClient(bool? ServerToClient = null)
     {
-        if (ServerToClient == false || (ServerToClient == null && server.activeSelf))
+        if (ServerToClient == false || (ServerToClient == null && !server.activeSelf))
         {
             server.SetActive(true);
-            store.SetActive(false);
+            store.gameObject.SetActive(false);
         }
-        else if(ServerToClient == true || (ServerToClient == null && !server.activeSelf))
+        else if(ServerToClient == true || (ServerToClient == null && server.activeSelf))
         {
             server.SetActive(false);
-            store.SetActive(true);
+            store.gameObject.SetActive(true);
         }
     }
     private void ClientConnected(bool connexion)
-    {
-
+    { 
     }
 
 }

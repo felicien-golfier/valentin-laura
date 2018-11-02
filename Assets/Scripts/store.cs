@@ -1,23 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class store : MonoBehaviour {
+public class Store : MonoBehaviour {
 
-
-    public server _server;
     public ClientToDiplay myClient;
-
     private int laura_id;
-    private Client _client;
+    private ClientLaura _client;
     private char separator = ':';
     private string lastUdpPacket;
 
     private void Update()
     {
-        if (_client != null)
-            UpdateMyClient();
-        string  udp = tools.instance.udp.getLatestUDPPacket();
+        string  udp = Tools.instance.udp.getLatestUDPPacket();
         if (udp != "" && udp != lastUdpPacket)
         {
             lastUdpPacket = udp;
@@ -27,21 +23,40 @@ public class store : MonoBehaviour {
     //Read NFC ID of a Client and store it. 
     public void FakeReadNFCID()
     {
-        _client = _server.NewClient(Random.Range(100000000, 999999999).ToString());
-        UpdateMyClient();
+        if (Tools.instance.netManager == null)
+        {
+            Tools.DisplayPopup(true, "Not connected to a server !");
+            return;
+        }
+        Tools.instance.netManager.CmdNewClient(Random.Range(100000000, 999999999).ToString());
     }
+
     public void ReadNFCID(string recieved_Client)
     {
+        if (Tools.instance.netManager == null)
+        {
+            Tools.DisplayPopup(true, "Not connected to a server !");
+            return;
+        }
         string clientID = recieved_Client.Split(separator)[1].Remove(0, 1).Replace("\r","");
 
         Debug.Log(clientID);
-        _client = _server.NewClient(clientID);
-        UpdateMyClient();
+        Tools.instance.netManager.CmdNewClient(clientID);
+        //_server.GetClientByID(clientID);
     }
 
-    public void UpdateMyClient()
+    public void UpdateMyClient(string nfc_id, int nbRemainingBet, float gains)
     {
-        _client = _server.GetClient(_client.nfc_id);
+        if (_client == null)
+            _client = new ClientLaura(nfc_id, nbRemainingBet, myClient);
+        _client.nfc_id = nfc_id;
+        _client.nbRemainingBet = nbRemainingBet;
+        _client.gains = gains;
+        DisplayMyClient();
+    }
+
+    public void DisplayMyClient()
+    {
         myClient.UpdateClient(_client.nfc_id, _client.nbRemainingBet, _client.gains);
         myClient.Display();
     }
@@ -50,13 +65,14 @@ public class store : MonoBehaviour {
     {
         if (_client == null)
         {
-            tools.DisplayPopup(true, "Please select a client");
+            Tools.DisplayPopup(true, "Please select a client");
         }else
         {
-            if (_server.UpdateClient(_client.nfc_id, number))
-                tools.DisplayPopup(true, "RequestSent");        
+            Tools.instance.netManager.CmdAddBet(_client.nfc_id, number);
+            Tools.DisplayPopup(true, "RequestSent");        
         }
     }
+
 }
 
 
