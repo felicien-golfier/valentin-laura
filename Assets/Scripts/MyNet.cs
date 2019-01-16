@@ -5,9 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class MyNet : MonoBehaviour {
-
-    public bool ImServer;
+public class MyNet : NetworkDiscovery
+{
     NetworkManager manager;
  
     private void Awake()
@@ -16,10 +15,22 @@ public class MyNet : MonoBehaviour {
     }
 
     void Start () {
-        if (ImServer)
+            this.Initialize();
+        if (Tools.instance.ImServer)
+        {
             manager.StartHost();
-        else
-        {   
+            this.StartAsServer();
+        }else
+        {
+            this.StartAsClient();
+        }
+    }
+
+    public override void OnReceivedBroadcast(string fromAddress, string data)
+    {
+        if (!Tools.instance.ImServer && !Tools.instance.ImConnected)
+        {
+            manager.networkAddress = fromAddress;
             manager.StartClient();
         }
     }

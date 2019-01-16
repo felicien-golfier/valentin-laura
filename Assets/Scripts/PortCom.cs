@@ -25,6 +25,7 @@ public class PortCom : MonoBehaviour {
     {
         if (Tools.instance.ImServer)
         {
+            _server = Tools.instance.serverLaura;
             comPort = FindMyPortAndConnect();
             portComThread = new Thread(new ThreadStart(mainThread));
             portComThread.IsBackground = true;
@@ -96,7 +97,15 @@ public class PortCom : MonoBehaviour {
             {
                 if (sp != null && sp.IsOpen)
                 {
-                    string tempS = sp.ReadLine();
+                    string tempS;
+                    try
+                    {
+                         tempS = sp.ReadLine();
+                    }catch(Exception err)
+                    {
+                        Debug.Log("CONTINUE\n"+err);
+                        continue;
+                    }
                     Debug.Log("SerialData : " + tempS);
                     string[] splitTempS = tempS.Split(':');
                     if (splitTempS.Length < 2)
@@ -115,6 +124,8 @@ public class PortCom : MonoBehaviour {
                     else if (splitTempS[1] == demandeTir)
                     {
                         float gain = _server.Tir(splitTempS[0]);
+                        if (gain == -1)
+                            continue;
                         string answer = splitTempS[0] + answerGains + gain;
                         Debug.Log("demandeTir : " + answer);
                         sp.WriteLine(answer);
@@ -134,7 +145,5 @@ public class PortCom : MonoBehaviour {
             }
         }
     }
-
-
 }
 #endif

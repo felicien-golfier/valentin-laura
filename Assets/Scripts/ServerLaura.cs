@@ -3,12 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class ServerLaura : MonoBehaviour
 {
     private List<ClientLaura> clients;
 
     public List<ClientToDiplay> clientsInterface;
+    public Text logs;
 
     public int lower = -99;
     public int greater = 13;
@@ -26,31 +28,33 @@ public class ServerLaura : MonoBehaviour
     }
 
 
-    private ClientLaura FindClient(string nfc_id)
-    {
-        foreach (ClientLaura c in clients)
-        {
-            if (c.nfc_id == nfc_id) return c;
-        }
-        return null;
-    }
+    //private ClientLaura FindClient(string nfc_id)
+    //{
+    //    foreach (ClientLaura c in clients)
+    //    {
+    //        if (c.nfc_id == nfc_id) return c;
+    //    }
+    //    return null;
+    //}
     public void DisplayAllClients(bool display=true)
     {
         clients.ForEach(c => { c.DisplayClient(display);});
     }
 
-    public bool UpdateClient(string nfc_id, int addBetNumber)
-    {
-        ClientLaura _client = FindClient(nfc_id);
-        if (_client != null)
-        {
-            _client.nbRemainingBet += addBetNumber;
-            _client.DisplayClient(true);
-            return true;
-        }
-        Debug.LogError("Client doesn't exist");
-        return false;
-    }
+    //public bool UpdateClient(string nfc_id, int addBetNumber)
+    //{
+    //    ClientLaura _client = FindClient(nfc_id);
+    //    if (_client != null)
+    //    {
+    //        _client.nbRemainingBet += addBetNumber;
+    //        _client.DisplayClient(true);
+    //        log("Client " + nfc_id + " updated with " + addBetNumber + " more bets. Remaining bets now " + _client.nbRemainingBet);
+    //        return true;
+    //    }
+    //    log("Client " + nfc_id + " doesn't exist !");
+    //    Debug.LogError("Client doesn't exist");
+    //    return false;
+    //}
 
     private ClientToDiplay GetNextEmptyClientGo()
     {
@@ -67,7 +71,7 @@ public class ServerLaura : MonoBehaviour
     public void NewClient(string nfc_id)
     {
         ClientLaura _client = GetClientByID(nfc_id);
-        Tools.DisplayPopup(true, "NewClient");
+        log("New client " + nfc_id);
         if (_client == null)
         {
             _client = new ClientLaura(nfc_id, 0, GetNextEmptyClientGo());
@@ -77,20 +81,21 @@ public class ServerLaura : MonoBehaviour
             Tools.instance.netManager.RpcSendClient(_client.nfc_id, _client.nbRemainingBet, _client.gains);
     }
 
-    public void AddBet(string nfc_id, int number)
+    public void AddBet(string nfc_id, int addBetNumber)
     {
         ClientLaura _client = GetClientByID(nfc_id);
-        Tools.DisplayPopup(true, "Add Bet !");
-
+        
         if (_client == null)
         {
-            _client = new ClientLaura(nfc_id, number, GetNextEmptyClientGo());
+            _client = new ClientLaura(nfc_id, addBetNumber, GetNextEmptyClientGo());
             clients.Add(_client);
             _client.DisplayClient(true);
+            log("New client " + nfc_id + " with bet " + addBetNumber + " more bets. Remaining bets now " + _client.nbRemainingBet);
         }
         else
         {
-            _client.nbRemainingBet += number;
+            _client.nbRemainingBet += addBetNumber;
+            log("Client " + nfc_id + " Added bet " + addBetNumber + " more bets. Remaining bets now " + _client.nbRemainingBet);
         }
 
         Tools.instance.netManager.RpcSendClient(_client.nfc_id, _client.nbRemainingBet, _client.gains);
@@ -109,14 +114,14 @@ public class ServerLaura : MonoBehaviour
 
     public float Tir(string id)
     {
-        ClientLaura _client = FindClient(id);
+        ClientLaura _client = GetClientByID(id);
         if (_client == null)
         {
-            Debug.Log("Client Not registered !!");
+            log("Client "+id+" shot but is not registered");
             return -1;
         }else if (_client.nbRemainingBet <= 0)
         {
-            Debug.Log("Client Has No remaining Bet !!");
+            log("Client " + id + " shot but has no remaining bet");
             return -1;
         }
         else
@@ -125,7 +130,7 @@ public class ServerLaura : MonoBehaviour
             if (gain <= 0)
                 return 0;
             _client.Won(gain);
-            Tools.DisplayPopupFromThread("You Won " + gain + "!!");
+            log("Client " + id + " shot and won "+gain+" gains");
             return gain;
         }
     }
@@ -136,5 +141,8 @@ public class ServerLaura : MonoBehaviour
         return (float) Math.Floor( Math.Exp(rnd.Next(lower,greater)));
     }
 
-
+    private void log(string newline)
+    {
+        logs.text = newline + "\n" + logs.text;
+    }
 }

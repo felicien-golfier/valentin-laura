@@ -8,7 +8,6 @@ public class Store : MonoBehaviour {
     public ClientToDiplay myClient;
     private int laura_id;
     private ClientLaura _client;
-    private char separator = ':';
     private string lastUdpPacket;
 
     private void Update()
@@ -33,12 +32,13 @@ public class Store : MonoBehaviour {
 
     public void ReadNFCID(string recieved_Client)
     {
+        
         if (Tools.instance.netManager == null)
         {
-            Tools.DisplayPopup(true, "Not connected to a server !");
+            Tools.DisplayPopup(true, "Got new client : " + recieved_Client + "\nBut not connected");
             return;
         }
-        string clientID = recieved_Client.Split(separator)[1].Remove(0, 1).Replace("\r","");
+        string clientID = recieved_Client.Remove(0, 1).Replace("\r", "");
 
         Debug.Log(clientID);
         Tools.instance.netManager.CmdNewClient(clientID);

@@ -35,7 +35,7 @@ public class NetworkBehaviourManager : NetworkBehaviour
     {
         if (!isServer)
         {
-            Tools.DisplayPopup(true, "Got Client !!");
+            Debug.Log("Got Client !!");
             Tools.instance.store.UpdateMyClient(nfc_id, nbRemainingBet, gains);
         }
     }
@@ -53,12 +53,13 @@ public class NetworkBehaviourManager : NetworkBehaviour
     }
     public override void OnStartClient()
     {
-        if (!isServer)
+        if (!isServer && !Tools.instance.ImConnected)
         {
             Tools.instance.ImServer = false;
             Tools.instance.ImConnected = true;
             ConnectedToServer(true);
             Debug.Log("I'm Client CONNECTED !");
+            Tools.DisplayPopup(true,"Connected");
         }
     }
 

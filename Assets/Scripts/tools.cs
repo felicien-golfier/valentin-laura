@@ -26,7 +26,8 @@ public class Tools : MonoBehaviour {
         }
         get { return m_ImConnected; }
     }
-    
+
+    public bool setServerBeforeBuild;
     public GameObject popup;
     public Text popupText;
     public GameObject server;
@@ -49,7 +50,7 @@ public class Tools : MonoBehaviour {
     private void Awake()
     {
         _instance = this;
-        ImServer = myNet.ImServer;
+        ImServer = setServerBeforeBuild;
     }
 
     public static void DisplayPopup(bool display, string txt = "")
