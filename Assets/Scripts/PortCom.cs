@@ -107,26 +107,34 @@ public class PortCom : MonoBehaviour {
                         continue;
                     }
                     Debug.Log("SerialData : " + tempS);
-                    string[] splitTempS = tempS.Split(':');
-                    if (splitTempS.Length < 2)
-                        continue;
-                    if (splitTempS[1] == tirRestants)
+
+
+
+                    if (tempS.Contains(tirRestants))
                     {
-                        
-                        ClientLaura client = _server.GetClientByID(splitTempS[0]);
+                        string id = tempS.Replace(tirRestants,"");
+                        id = id.Substring(0, id.Length - 1);
+                        ClientLaura client = _server.GetClientByID(id);
                         if (client != null)
                         {
-                            string answer = splitTempS[0] + answerRestants + client.nbRemainingBet;
-                            Debug.Log("tirRestants :" + answer);
+                            string answer = id + " "+ answerRestants + "["+client.nbRemainingBet+"]";
+                            _server.log("Client "+id+" ping. He has " + client.nbRemainingBet +" remaining bets");
+                            Debug.Log("answerRestants : " + answer);
                             sp.WriteLine(answer);
                         }
+                        else _server.log("The id " + id +" doesn't exist");
                     }
-                    else if (splitTempS[1] == demandeTir)
+                    else if (tempS.Contains(demandeTir))
                     {
-                        float gain = _server.Tir(splitTempS[0]);
+                        string id = tempS.Replace(demandeTir,"");
+                        id = id.Substring(0, id.Length - 1);
+                        float gain = _server.Tir(id);
                         if (gain == -1)
+                        {
+                            Debug.LogError("Client not recognized");
                             continue;
-                        string answer = splitTempS[0] + answerGains + gain;
+                        }
+                        string answer = id + " " + answerGains + "[" + gain + "]";
                         Debug.Log("demandeTir : " + answer);
                         sp.WriteLine(answer);
                     }

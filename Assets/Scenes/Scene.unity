@@ -2409,8 +2409,9 @@ MonoBehaviour:
   - client: {fileID: 2100635397}
   - client: {fileID: 109947405}
   logs: {fileID: 1932549188}
-  lower: -99
-  greater: 13
+  lower: 1
+  greater: 10
+  percentWinRate: 40
 --- !u!4 &1519976220
 Transform:
   m_ObjectHideFlags: 0
@@ -2560,7 +2561,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7a8409c07edea74386ea642fd33a67f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  setServerBeforeBuild: 1
+  setServerBeforeBuild: 0
   popup: {fileID: 103725631}
   popupText: {fileID: 1816508656}
   server: {fileID: 2118644920}

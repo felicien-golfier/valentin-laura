@@ -11,13 +11,26 @@ public class ServerLaura : MonoBehaviour
 
     public List<ClientToDiplay> clientsInterface;
     public Text logs;
-
-    public int lower = -99;
-    public int greater = 13;
+    private string logTmp;
+    private string clientChanged = "";
+    public int lower = 1;
+    public int greater = 10;
+    public float percentWinRate = 40;
 
     private void Update()
     {
         DisplayAllClients();
+        if (logTmp != "")
+        {
+            logs.text = logTmp + "\n" + logs.text;
+            logTmp = "";
+        }
+        if (clientChanged != "")
+        {
+            ClientLaura _client = GetClientByID(clientChanged);
+            Tools.instance.netManager.RpcSendClient(_client.nfc_id, _client.nbRemainingBet, _client.gains);
+            clientChanged = "";
+        }
     }
 
     private void Start()
@@ -128,9 +141,14 @@ public class ServerLaura : MonoBehaviour
         {
             float gain = GetGain();
             if (gain <= 0)
-                return 0;
+            {
+                gain = 0;
+            }
+
+            log("Client " + id + " shot and won " + gain );
+            
             _client.Won(gain);
-            log("Client " + id + " shot and won "+gain+" gains");
+            clientChanged = _client.nfc_id;
             return gain;
         }
     }
@@ -138,11 +156,16 @@ public class ServerLaura : MonoBehaviour
     public float GetGain()
     {
         System.Random rnd = new System.Random();
-        return (float) Math.Floor( Math.Exp(rnd.Next(lower,greater)));
+        rnd.Next(lower, greater);
+        int didWon = rnd.Next(100);
+        if (didWon > percentWinRate)
+            return 0;
+        return rnd.Next(lower,greater);
+
     }
 
-    private void log(string newline)
+    public void log(string newline)
     {
-        logs.text = newline + "\n" + logs.text;
+        logTmp = logTmp == "" ? newline: newline + "\n" + logTmp;
     }
 }
